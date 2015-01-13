@@ -169,11 +169,7 @@ namespace eParafia
             try
             {
                 dr = command.ExecuteReader();
-                while (dr.Read())
-                {
-                    for (int i = 0; i < dr.FieldCount; i++)
-                        Console.Write("{0}   ", dr[i]);
-                }
+                while (dr.Read()) ;
             }
             catch (NpgsqlException exc)
             {
@@ -653,31 +649,39 @@ namespace eParafia
             if (type == "parafianie")
             {
                 string query = "SELECT * FROM all_parafianie";
-                NpgsqlCommand command = new NpgsqlCommand(query, connection);
-                NpgsqlDataReader dr = command.ExecuteReader();
-                while (dr.Read())
+                NpgsqlDataReader dr = null;
+                try
                 {
-                    Console.WriteLine(dr[0] + " (PESEL: " + dr[1] + ")");
-                    Console.WriteLine("\tChrzest dnia: " + dr[2].ToString().Substring(0, 10));
-                    if (! dr[3].GetType().Equals(typeof(System.DBNull)))
-                        Console.WriteLine("\tPierwsza Komunia dnia: " + dr[3].ToString().Substring(0, 10));
-                    if (! dr[4].GetType().Equals(typeof(System.DBNull)))
-                        Console.WriteLine("\tBierzmowanie dnia: " + dr[4].ToString().Substring(0, 10));
-                    if (! dr[5].GetType().Equals(typeof(System.DBNull)))
+                    NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                    dr = command.ExecuteReader();
+                    while (dr.Read())
                     {
-                        Console.Write("\tŚlub dnia: " + dr[5].ToString().Substring(0, 10));
-                        Console.WriteLine(", Małżonek: " + dr[6].ToString());
-                    }
-                    if (! dr[8].GetType().Equals(typeof(System.DBNull)))
-                    {
-                        if (dr[7].GetType().Equals(typeof(System.DBNull)))
-                            Console.Write("\tData śmierci nieznana");
-                        else
-                            Console.Write("\tData śmierci: " + dr[7].ToString().Substring(0, 10));
-                        Console.WriteLine(", Data pogrzebu: " + dr[8].ToString().Substring(0,10));
+                        Console.WriteLine(dr[0] + " (PESEL: " + dr[1] + ")");
+                        Console.WriteLine("\tChrzest dnia: " + dr[2].ToString().Substring(0, 10));
+                        if (!dr[3].GetType().Equals(typeof(System.DBNull)))
+                            Console.WriteLine("\tPierwsza Komunia dnia: " + dr[3].ToString().Substring(0, 10));
+                        if (!dr[4].GetType().Equals(typeof(System.DBNull)))
+                            Console.WriteLine("\tBierzmowanie dnia: " + dr[4].ToString().Substring(0, 10));
+                        if (!dr[5].GetType().Equals(typeof(System.DBNull)))
+                        {
+                            Console.Write("\tŚlub dnia: " + dr[5].ToString().Substring(0, 10));
+                            Console.WriteLine(", Małżonek: " + dr[6].ToString());
+                        }
+                        if (!dr[8].GetType().Equals(typeof(System.DBNull)))
+                        {
+                            if (dr[7].GetType().Equals(typeof(System.DBNull)))
+                                Console.Write("\tData śmierci nieznana");
+                            else
+                                Console.Write("\tData śmierci: " + dr[7].ToString().Substring(0, 10));
+                            Console.WriteLine(", Data pogrzebu: " + dr[8].ToString().Substring(0, 10));
+                        }
                     }
                 }
-                dr.Close();
+                finally
+                {
+                    if(dr != null)
+                        dr.Close();
+                }
             }
             else if (type == "all")
             {
@@ -701,14 +705,22 @@ namespace eParafia
                     query += " AND (SELECT date_part('year', s.data_udzielenia) <= " + end + ")";
                 }
                 NpgsqlCommand command = new NpgsqlCommand(query, connection);
-                NpgsqlDataReader dr = command.ExecuteReader();
-                while (dr.Read())
+                NpgsqlDataReader dr = null;
+                try
                 {
-                    for (int i = 0; i < dr.FieldCount; ++i)
-                        Console.Write(dr[i] + " ");
-                    Console.Write("\n");
+                    dr = command.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        for (int i = 0; i < dr.FieldCount; ++i)
+                            Console.Write(dr[i] + " ");
+                        Console.Write("\n");
+                    }
                 }
-                dr.Close();
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
             }
             else if (type == "pierwsze komunie")
             {
@@ -724,12 +736,21 @@ namespace eParafia
                     query += " AND (SELECT date_part('year', s.data_udzielenia) <= " + end + ")";
                 }
                 NpgsqlCommand command = new NpgsqlCommand(query, connection);
-                NpgsqlDataReader dr = command.ExecuteReader();
-                while (dr.Read())
+                NpgsqlDataReader dr = null;
+                try
                 {
-                    for (int i = 0; i < dr.FieldCount; ++i)
-                        Console.Write(dr[i] + " ");
-                    Console.Write("\n");
+                    dr = command.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        for (int i = 0; i < dr.FieldCount; ++i)
+                            Console.Write(dr[i] + " ");
+                        Console.Write("\n");
+                    }
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
                 }
             }
             else if (type == "bierzmowania")
@@ -748,12 +769,21 @@ namespace eParafia
                     query += " AND (SELECT date_part('year', s.data_udzielenia) <= " + end + ")";
                 }
                 NpgsqlCommand command = new NpgsqlCommand(query, connection);
-                NpgsqlDataReader dr = command.ExecuteReader();
-                while (dr.Read())
+                NpgsqlDataReader dr = null;
+                try
                 {
-                    for (int i = 0; i < dr.FieldCount; ++i)
-                        Console.Write(dr[i] + " ");
-                    Console.Write("\n");
+                    dr = command.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        for (int i = 0; i < dr.FieldCount; ++i)
+                            Console.Write(dr[i] + " ");
+                        Console.Write("\n");
+                    }
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
                 }
             }
             else if (type == "sluby")
@@ -771,23 +801,32 @@ namespace eParafia
                     query += " AND (SELECT date_part('year', s.data_udzielenia) <= " + end + ")";
                 }
                 NpgsqlCommand command = new NpgsqlCommand(query, connection);
-                NpgsqlDataReader dr = command.ExecuteReader();
-                while (dr.Read())
+                NpgsqlDataReader dr = null;
+                try
                 {
-                    string maz_dane = null;
-                    string zona_dane = null;
-                    if (dr[2].GetType().Equals(typeof(System.DBNull)))
-                        maz_dane = (string)dr[1] + " (osoba spoza parafii) ";
-                    else
-                        maz_dane = dr[2] + " (PESEL: " + dr[0] + ") ";
-                    if (dr[5].GetType().Equals(typeof(System.DBNull)))
-                        zona_dane = (string)dr[4] + " (osoba spoza parafii) ";
-                    else
-                        zona_dane = dr[5] + " (PESEL: " + dr[3] + ") ";
-                    string res = maz_dane + " i " + zona_dane + "zawarli ślub dnia " + dr[9].ToString().Substring(0, 10) + ", świadkowie: " + dr[6] + ", " + dr[7];
-                    if ((bool)dr[8] == true)
-                        res += " (unieważniony)";
-                    Console.WriteLine(res);
+                    dr = command.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        string maz_dane = null;
+                        string zona_dane = null;
+                        if (dr[2].GetType().Equals(typeof(System.DBNull)))
+                            maz_dane = (string)dr[1] + " (osoba spoza parafii) ";
+                        else
+                            maz_dane = dr[2] + " (PESEL: " + dr[0] + ") ";
+                        if (dr[5].GetType().Equals(typeof(System.DBNull)))
+                            zona_dane = (string)dr[4] + " (osoba spoza parafii) ";
+                        else
+                            zona_dane = dr[5] + " (PESEL: " + dr[3] + ") ";
+                        string res = maz_dane + " i " + zona_dane + "zawarli ślub dnia " + dr[9].ToString().Substring(0, 10) + ", świadkowie: " + dr[6] + ", " + dr[7];
+                        if ((bool)dr[8] == true)
+                            res += " (unieważniony)";
+                        Console.WriteLine(res);
+                    }
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
                 }
             }
             else if (type == "pogrzeby")
@@ -804,14 +843,23 @@ namespace eParafia
                     query += " AND (SELECT date_part('year', pog.data_smierci) <= " + end + ")";
                 }
                 NpgsqlCommand command = new NpgsqlCommand(query, connection);
-                NpgsqlDataReader dr = command.ExecuteReader();
-                while (dr.Read())
+                NpgsqlDataReader dr = null;
+                try
                 {
-                    for (int i = 0; i < dr.FieldCount - 1; ++i)
-                        Console.Write(dr[i] + " ");
-                    if ((bool)dr[dr.FieldCount - 1] == true)
-                        Console.Write("(data śmierci nieznana)");
-                    Console.Write("\n");
+                    dr = command.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        for (int i = 0; i < dr.FieldCount - 1; ++i)
+                            Console.Write(dr[i] + " ");
+                        if ((bool)dr[dr.FieldCount - 1] == true)
+                            Console.Write("(data śmierci nieznana)");
+                        Console.Write("\n");
+                    }
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
                 }
             }
         }
