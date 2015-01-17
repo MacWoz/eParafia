@@ -648,7 +648,7 @@ namespace eParafia
         {
             if (type == "parafianie")
             {
-                string query = "SELECT * FROM all_parafianie";
+                string query = "SELECT * FROM all_parafianie ORDER BY chrzest";
                 NpgsqlDataReader dr = null;
                 try
                 {
@@ -657,23 +657,25 @@ namespace eParafia
                     while (dr.Read())
                     {
                         Console.WriteLine(dr[0] + " (PESEL: " + dr[1] + ")");
-                        Console.WriteLine("\tChrzest dnia: " + dr[2].ToString().Substring(0, 10));
-                        if (!dr[3].GetType().Equals(typeof(System.DBNull)))
-                            Console.WriteLine("\tPierwsza Komunia dnia: " + dr[3].ToString().Substring(0, 10));
-                        if (!dr[4].GetType().Equals(typeof(System.DBNull)))
-                            Console.WriteLine("\tBierzmowanie dnia: " + dr[4].ToString().Substring(0, 10));
+                        Console.WriteLine("\t" + dr[2]);
+                        Console.WriteLine("\t" + dr[3]);
+                        Console.WriteLine("\tChrzest dnia: " + dr[4].ToString().Substring(0, 10));
                         if (!dr[5].GetType().Equals(typeof(System.DBNull)))
+                            Console.WriteLine("\tPierwsza Komunia dnia: " + dr[5].ToString().Substring(0, 10));
+                        if (!dr[6].GetType().Equals(typeof(System.DBNull)))
+                            Console.WriteLine("\tBierzmowanie dnia: " + dr[6].ToString().Substring(0, 10));
+                        if (!dr[7].GetType().Equals(typeof(System.DBNull)))
                         {
-                            Console.Write("\tŚlub dnia: " + dr[5].ToString().Substring(0, 10));
-                            Console.WriteLine(", Małżonek: " + dr[6].ToString());
+                            Console.Write("\tŚlub dnia: " + dr[7].ToString().Substring(0, 10));
+                            Console.WriteLine(", Małżonek: " + dr[8].ToString());
                         }
-                        if (!dr[8].GetType().Equals(typeof(System.DBNull)))
+                        if (!dr[10].GetType().Equals(typeof(System.DBNull)))
                         {
-                            if (dr[7].GetType().Equals(typeof(System.DBNull)))
+                            if (dr[9].GetType().Equals(typeof(System.DBNull)))
                                 Console.Write("\tData śmierci nieznana");
                             else
-                                Console.Write("\tData śmierci: " + dr[7].ToString().Substring(0, 10));
-                            Console.WriteLine(", Data pogrzebu: " + dr[8].ToString().Substring(0, 10));
+                                Console.Write("\tData śmierci: " + dr[9].ToString().Substring(0, 10));
+                            Console.WriteLine(", Data pogrzebu: " + dr[10].ToString().Substring(0, 10));
                         }
                     }
                 }
