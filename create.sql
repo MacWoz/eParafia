@@ -172,8 +172,22 @@ CREATE OR REPLACE FUNCTION check_chrzest() RETURNS trigger AS $check_chrzest$
     END;
 $check_chrzest$ LANGUAGE plpgsql;
 
-CREATE TRIGGER check_chrzest BEFORE INSERT OR UPDATE ON chrzty FOR EACH ROW
+CREATE TRIGGER check_chrzest BEFORE INSERT ON chrzty FOR EACH ROW
     EXECUTE PROCEDURE check_chrzest();  
+
+CREATE OR REPLACE FUNCTION check_chrzest_update() RETURNS trigger AS $check_chrzest_update$
+	DECLARE r RECORD;
+    BEGIN
+	    SELECT INTO r * FROM parafianie WHERE pesel = NEW.osoba LIMIT 1;
+	    IF r.data_urodzenia > (SELECT data_udzielenia FROM sakramenty where id = NEW.id_sakramentu) THEN
+	        RAISE EXCEPTION 'Zla data chrztu!';
+	    END IF;
+	    RETURN NEW;
+    END;
+$check_chrzest_update$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_chrzest_update BEFORE UPDATE ON chrzty FOR EACH ROW
+    EXECUTE PROCEDURE check_chrzest_update(); 
 
 CREATE OR REPLACE FUNCTION check_komunia() RETURNS trigger AS $check_komunia$
 	DECLARE r RECORD;
@@ -193,8 +207,27 @@ CREATE OR REPLACE FUNCTION check_komunia() RETURNS trigger AS $check_komunia$
     END;
 $check_komunia$ LANGUAGE plpgsql;
 
-CREATE TRIGGER check_komunia BEFORE INSERT OR UPDATE ON pierwsze_komunie FOR EACH ROW
+CREATE TRIGGER check_komunia BEFORE INSERT ON pierwsze_komunie FOR EACH ROW
     EXECUTE PROCEDURE check_komunia();
+
+CREATE OR REPLACE FUNCTION check_komunia_update() RETURNS trigger AS $check_komunia_update$
+	DECLARE r RECORD;
+    BEGIN
+	    IF (SELECT EXISTS (SELECT 1 from chrzty where osoba = NEW.osoba)) = FALSE THEN 
+	    	RAISE EXCEPTION 'Osoba nie jest jeszcze ochrzczona!';
+	    END IF;
+
+	    SELECT INTO r * FROM chrzty c join sakramenty s on s.id = c.id_sakramentu WHERE c.osoba = NEW.osoba LIMIT 1;
+        IF r.data_udzielenia > (SELECT data_udzielenia FROM sakramenty where id = NEW.id_sakramentu) THEN
+        	RAISE EXCEPTION 'Zla data komunii!';
+        END IF;
+
+	    RETURN NEW;
+    END;
+$check_komunia_update$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_komunia_update BEFORE UPDATE ON pierwsze_komunie FOR EACH ROW
+    EXECUTE PROCEDURE check_komunia_update();
 
 CREATE OR REPLACE FUNCTION check_bierzmowanie() RETURNS trigger AS $check_bierzmowanie$
 	DECLARE r RECORD;
@@ -217,8 +250,29 @@ CREATE OR REPLACE FUNCTION check_bierzmowanie() RETURNS trigger AS $check_bierzm
     END;
 $check_bierzmowanie$ LANGUAGE plpgsql;
 
-CREATE TRIGGER check_bierzmowanie BEFORE INSERT OR UPDATE ON bierzmowania FOR EACH ROW
+CREATE TRIGGER check_bierzmowanie BEFORE INSERT ON bierzmowania FOR EACH ROW
     EXECUTE PROCEDURE check_bierzmowanie();
+
+CREATE OR REPLACE FUNCTION check_bierzmowanie_update() RETURNS trigger AS $check_bierzmowanie_update$
+	DECLARE r RECORD;
+    BEGIN
+	    IF (SELECT EXISTS (SELECT 1 from chrzty where osoba = NEW.osoba)) = FALSE THEN 
+	    	RAISE EXCEPTION 'Osoba nie jest jeszcze ochrzczona!';
+	    END IF;
+		IF (SELECT EXISTS (SELECT 1 from pierwsze_komunie where osoba = NEW.osoba)) = FALSE THEN 
+	    	RAISE EXCEPTION 'Osoba nie przyjela jeszcze pierwszej Komunii!';
+	    END IF;
+	    SELECT INTO r * FROM pierwsze_komunie p join sakramenty s on s.id = p.id_sakramentu WHERE p.osoba = NEW.osoba LIMIT 1;
+        IF r.data_udzielenia > (SELECT data_udzielenia FROM sakramenty where id = NEW.id_sakramentu) THEN
+        	RAISE EXCEPTION 'Zla data bierzmowania!';
+        END IF;
+
+	    RETURN NEW;
+    END;
+$check_bierzmowanie_update$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_bierzmowanie_update BEFORE UPDATE ON bierzmowania FOR EACH ROW
+    EXECUTE PROCEDURE check_bierzmowanie_update();
 
 CREATE OR REPLACE FUNCTION check_slub() RETURNS trigger AS $check_slub$
 	DECLARE r RECORD;
@@ -295,6 +349,60 @@ $check_slub$ LANGUAGE plpgsql;
 CREATE TRIGGER check_slub BEFORE INSERT ON sluby FOR EACH ROW
     EXECUTE PROCEDURE check_slub();
 
+CREATE OR REPLACE FUNCTION check_slub_update() RETURNS trigger AS $check_slub_update$
+	DECLARE r RECORD;
+	DECLARE rec RECORD;
+    BEGIN
+    	IF NEW.maz IS NOT NULL THEN
+		    SELECT INTO r * FROM bierzmowania b join sakramenty s on s.id = b.id_sakramentu WHERE b.osoba = NEW.maz LIMIT 1;
+	        IF r.data_udzielenia > (SELECT data_udzielenia FROM sakramenty where id = NEW.id_sakramentu) THEN
+	        	RAISE EXCEPTION 'Zla data slubu!';
+	        END IF;
+		    IF (SELECT EXISTS (SELECT 1 from sluby where maz = NEW.maz AND uniewazniony = FALSE)) = TRUE THEN
+		    	FOR rec IN SELECT zona FROM sluby WHERE maz = NEW.maz AND uniewazniony = FALSE LOOP
+		    		IF (SELECT EXISTS (SELECT * FROM pogrzeby WHERE osoba = zona)) = FALSE THEN
+		    			RAISE EXCEPTION 'Mezczyzna jest juz w innym zwiazku malzenskim!';
+		    		END IF;
+		    	END LOOP;
+		    END IF;
+		    IF (SELECT plec FROM parafianie WHERE pesel = NEW.maz) != 'M' THEN
+		    	RAISE EXCEPTION 'Zla plec mezczyzny!';
+		    END IF;
+		END IF;
+
+		IF NEW.zona IS NOT NULL THEN
+		    IF (SELECT EXISTS (SELECT 1 from chrzty where osoba = NEW.zona)) = FALSE THEN 
+		    	RAISE EXCEPTION 'Osoba nie jest jeszcze ochrzczona!';
+		    END IF;
+			IF (SELECT EXISTS (SELECT 1 from pierwsze_komunie where osoba = NEW.zona)) = FALSE THEN 
+		    	RAISE EXCEPTION 'Osoba nie przyjela jeszcze pierwszej Komunii!';
+		    END IF;
+		    IF (SELECT EXISTS (SELECT 1 from bierzmowania where osoba = NEW.zona)) = FALSE THEN 
+		    	RAISE EXCEPTION 'Osoba nie przyjela jeszcze bierzmowania!';
+		    END IF;
+		    SELECT INTO r * FROM bierzmowania b join sakramenty s on s.id = b.id_sakramentu WHERE b.osoba = NEW.zona LIMIT 1;
+	        IF r.data_udzielenia > (SELECT data_udzielenia FROM sakramenty where id = NEW.id_sakramentu) THEN
+	        	RAISE EXCEPTION 'Zla data slubu!';
+	        END IF;
+		    IF (SELECT EXISTS (SELECT 1 from sluby where zona = NEW.zona AND uniewazniony = FALSE)) = TRUE THEN
+		    	FOR rec IN SELECT maz FROM sluby WHERE zona = NEW.zona AND uniewazniony = FALSE LOOP
+		    		IF (SELECT EXISTS (SELECT * FROM pogrzeby WHERE osoba = maz)) = FALSE THEN
+		    			RAISE EXCEPTION 'Kobieta jest juz w innym zwiazku malzenskim!';
+		    		END IF;
+		    	END LOOP;
+		    END IF;
+
+		    IF (SELECT plec FROM parafianie WHERE pesel = NEW.zona) != 'K' THEN
+		    	RAISE EXCEPTION 'Zla plec kobiety!';
+		    END IF;
+		END IF;
+	    RETURN NEW;
+    END;
+$check_slub_update$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_slub_update BEFORE UPDATE ON sluby FOR EACH ROW
+    EXECUTE PROCEDURE check_slub_update();
+
 CREATE OR REPLACE FUNCTION insert_chrzty(osoba CHAR(11), nazwisko CHARACTER VARYING(50), imie CHARACTER VARYING(30), 
 data_urodzenia DATE, plec CHAR(1), ojciec CHAR(11), matka CHAR(11), data_udzielenia DATE, imie_chrztu CHARACTER VARYING(60), 
 ojciec_chrzestny CHARACTER VARYING(80), matka_chrzestna CHARACTER VARYING(80)) 
@@ -302,12 +410,11 @@ RETURNS INT AS $$
     DECLARE
     	ident INT;
     BEGIN
-    	select into ident nextval('sakramenty_id_seq');
     	INSERT INTO parafianie values (osoba, nazwisko, imie, data_urodzenia, plec, ojciec, matka);
-	    INSERT INTO sakramenty values(ident, data_udzielenia);
+	    INSERT INTO sakramenty values(DEFAULT, data_udzielenia) RETURNING id INTO ident;
 	    INSERT INTO chrzty values(ident, osoba, imie_chrztu, ojciec_chrzestny, matka_chrzestna);
 	    UPDATE sakramenty SET powiazany = TRUE WHERE id = ident;
-	    RETURN NULL;
+	    RETURN ident;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -315,11 +422,10 @@ CREATE OR REPLACE FUNCTION insert_komunie(data_udzielenia DATE, osoba CHAR(11)) 
     DECLARE
     	ident INT;
     BEGIN
-    	select into ident nextval('sakramenty_id_seq');
-	    INSERT INTO sakramenty values(ident, data_udzielenia);
+	    INSERT INTO sakramenty values(DEFAULT, data_udzielenia) RETURNING id INTO ident;
 	    INSERT INTO pierwsze_komunie values(ident, osoba);
 	    UPDATE sakramenty SET powiazany = TRUE WHERE id = ident;
-	    RETURN NULL;
+	    RETURN ident;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -327,15 +433,11 @@ CREATE OR REPLACE FUNCTION insert_bierzmowania(data_udzielenia DATE, osoba CHAR(
 RETURNS INT AS $$
     DECLARE
     	ident INT;
-    	sw INT;
-    	ch BOOLEAN;
     BEGIN
-    	select into ident nextval('sakramenty_id_seq');
-    	SELECT INTO ch EXISTS (SELECT * FROM swiadkowie WHERE dane = swiadek);
-	    INSERT INTO sakramenty values(ident, data_udzielenia);
+	    INSERT INTO sakramenty values(DEFAULT, data_udzielenia) RETURNING id INTO ident;
         INSERT INTO bierzmowania values(ident, osoba, imie, swiadek);
 	    UPDATE sakramenty s SET powiazany = TRUE WHERE id = ident;
-	    RETURN NULL;
+	    RETURN ident;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -344,8 +446,7 @@ dane2 CHARACTER VARYING(60), swiadek1 CHARACTER VARYING(80), swiadek2 CHARACTER 
     DECLARE
     	ident INT;
     BEGIN
-    	select into ident nextval('sakramenty_id_seq');
-	    INSERT INTO sakramenty values(ident, data_udzielenia);
+	    INSERT INTO sakramenty values(DEFAULT, data_udzielenia) RETURNING id INTO ident;
 	    INSERT INTO sluby values(ident, osoba1, dane1, osoba2, dane2, swiadek1, swiadek2, FALSE);
 	    UPDATE sakramenty SET powiazany = TRUE WHERE id = ident;
 	    RETURN NULL;
