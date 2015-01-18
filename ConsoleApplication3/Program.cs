@@ -51,6 +51,9 @@ namespace eParafia
 
             Console.WriteLine("Aby wyświetlić odpowiednie informacje wpisz \"wyswietl\".\n");
             Console.WriteLine("Następnie postępuj według dalszych instrukcji.");
+
+            Console.WriteLine("Aby poprawić błędne dane wpisz \"popraw\".\n");
+            Console.WriteLine("Następnie postępuj według dalszych instrukcji.");
             Console.WriteLine("\n\n");
 
             Console.WriteLine("Inne polecenia nie będą rozpoznane przez aplikację.");
@@ -97,6 +100,9 @@ namespace eParafia
                     break;
                 case "wyswietl":
                     ShowInfo();
+                    break;
+                case "popraw":
+                    Correct();
                     break;
                 default:
                     Console.WriteLine("Nie odnaleziono polecenia.");
@@ -1140,6 +1146,392 @@ namespace eParafia
                 return count;
             }
             return 0;
+        }
+
+        public static void Correct()
+        {
+            Console.WriteLine("Jakie informacje chcesz poprawić?");
+            Console.WriteLine("Wpisz odpowiednio: \"dane\", \"chrzest\", \"pierwsza komunia\", \"bierzmowanie\", \"slub\" lub \"pogrzeb\")");
+            string answer = Console.ReadLine();
+            if (answer == "dane")
+            {
+                Console.WriteLine("Podaj PESEL osoby, której informacje chcesz poprawić.");
+                string pesel = Console.ReadLine();
+                Console.WriteLine("Podaj imię:");
+                string imie = "'" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj nazwisko:");
+                string nazwisko = "'" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj nowy PESEL (jeśli nie chceszz zmienić, wpisz ten sam)");
+                string new_pesel = "'" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj datę urodzenia (w formacie YYYY-MM-DD):");
+                string data_urodzenia = "date '" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj płeć (K lub M):");
+                string plec = "'" + Console.ReadLine()[0] + "'";
+                Console.WriteLine("Podaj PESEL ojca (wpisz \"nieznany\" jeśli ojciec nie należy do parafii):");
+                string ojciec_pesel = Console.ReadLine();
+                if (ojciec_pesel == "nieznany")
+                    ojciec_pesel = "null";
+                else
+                    ojciec_pesel = "'" + ojciec_pesel + "'";
+                Console.WriteLine("Podaj PESEL matki (wpisz \"nieznany\" jeśli matka nie należy do parafii):");
+                string matka_pesel = Console.ReadLine();
+                if (matka_pesel == "nieznany")
+                    matka_pesel = "null";
+                else
+                    matka_pesel = "'" + matka_pesel + "'";
+                
+                string query = "UPDATE parafianie SET pesel = " + new_pesel + ", nazwisko = " + nazwisko + ", imie = " + imie + ", data_urodzenia = " + data_urodzenia + ", plec = " + plec + ", ";
+                query += "ojciec = " + ojciec_pesel + ", matka = " + matka_pesel + ", data_urodzenia = " + data_urodzenia + " WHERE pesel = " + pesel;
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                NpgsqlDataReader dr = null;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    while (dr.Read()) ;
+                }
+                catch (NpgsqlException exc)
+                {
+                    Console.WriteLine(exc.BaseMessage);
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+            }
+            else if (answer == "chrzest")
+            {
+                Console.WriteLine("Podaj PESEL osoby, której informacje chcesz poprawić.");
+                string pesel = "'" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj imię (imiona) nadane na chrzcie:");
+                string imiona = "'" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj imię i nazwisko ojca chrzestnego:");
+                string dane_ojca = "'" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj imię i nazwisko matki chrzestnej:");
+                string dane_matki = "'" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj datę chrztu (w formacie YYYY-MM-DD):");
+                string data = "date '" + Console.ReadLine() + "'";
+                string query = "UPDATE chrzty SET imie_chrztu = " + imiona + ", ojciec_chrzestny = " + dane_ojca + ", matka_chrzestna = " + dane_matki + " WHERE osoba = " + pesel;
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                NpgsqlDataReader dr = null;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    while (dr.Read()) ;
+                }
+                catch (NpgsqlException exc)
+                {
+                    Console.WriteLine(exc.BaseMessage);
+                    return;
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+                query = "SELECT id_sakramentu FROM chrzty WHERE osoba = " + pesel;
+                command = new NpgsqlCommand(query, connection);
+                dr = null;
+                int id = 0;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    dr.Read();
+                    id = (int)dr[0];
+                }
+                catch (NpgsqlException exc)
+                {
+                    Console.WriteLine(exc.BaseMessage);
+                    return;
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+                query = "UPDATE skaramenty SET data_udzielenia = " + data + " WHERE id = " + id;
+                command = new NpgsqlCommand(query, connection);
+                dr = null;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    while (dr.Read()) ;
+                }
+                catch (NpgsqlException exc)
+                {
+                    Console.WriteLine(exc.BaseMessage);
+                    return;
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+            }
+            else if (answer == "pierwsza komunia")
+            {
+                Console.WriteLine("Podaj PESEL osoby, której informacje chcesz poprawić.");
+                string pesel = "'" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj datę I Komunii (w formacie YYYY-MM-DD):");
+                string data = "date '" + Console.ReadLine() + "'";
+                string query = "SELECT id_sakramentu FROM pierwsze_komunie WHERE osoba = " + pesel;
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                NpgsqlDataReader dr = null;
+                int id = 0;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    dr.Read();
+                    id = (int)dr[0];
+                }
+                catch (NpgsqlException exc)
+                {
+                    Console.WriteLine(exc.BaseMessage);
+                    return;
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+                query = "UPDATE skaramenty SET data_udzielenia = " + data + " WHERE id = " + id;
+                command = new NpgsqlCommand(query, connection);
+                dr = null;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    while (dr.Read()) ;
+                }
+                catch (NpgsqlException exc)
+                {
+                    Console.WriteLine(exc.BaseMessage);
+                    return;
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+            }
+
+            else if (answer == "bierzmowanie")
+            {
+                Console.WriteLine("Podaj PESEL osoby, której informacje chcesz poprawić.");
+                string pesel = "'" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj imię nadane na bierzmowaniu:");
+                string imie = "'" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj imię i nazwisko świadka:");
+                string swiadek = "'" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj datę chrztu (w formacie YYYY-MM-DD):");
+                string data = "date '" + Console.ReadLine() + "'";
+                string query = "UPDATE bierzmowania SET imie_bierzmowania = " + imie + ", swiadek = " + swiadek + " WHERE osoba = " + pesel;
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                NpgsqlDataReader dr = null;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    while (dr.Read()) ;
+                }
+                catch (NpgsqlException exc)
+                {
+                    Console.WriteLine(exc.BaseMessage);
+                    return;
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+                query = "SELECT id_sakramentu FROM bierzmowania WHERE osoba = " + pesel;
+                command = new NpgsqlCommand(query, connection);
+                dr = null;
+                int id = 0;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    dr.Read();
+                    id = (int)dr[0];
+                }
+                catch (NpgsqlException exc)
+                {
+                    Console.WriteLine(exc.BaseMessage);
+                    return;
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+                query = "UPDATE skaramenty SET data_udzielenia = " + data + " WHERE id = " + id;
+                command = new NpgsqlCommand(query, connection);
+                dr = null;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    while (dr.Read()) ;
+                }
+                catch (NpgsqlException exc)
+                {
+                    Console.WriteLine(exc.BaseMessage);
+                    return;
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+            }
+
+            else if (answer == "slub")
+            {
+                Console.WriteLine("Czy mężczyzna jest z parafii? (T/N)");
+                string resp = Console.ReadLine();
+                string pesel_mezczyzny = null;
+                string dane_mezczyzny = null;
+                string pesel_kobiety = null;
+                string dane_kobiety = null;
+                if (resp == "T")
+                {
+                    Console.WriteLine("Podaj PESEL mężczyzny:");
+                    pesel_mezczyzny = " = '" + Console.ReadLine() + "'";
+                    dane_mezczyzny = " is NULL";
+                }
+                else if (resp == "N")
+                {
+                    Console.WriteLine("Podaj dane mężczyzny:");
+                    pesel_mezczyzny = " is NULL";
+                    dane_mezczyzny = " = '" + Console.ReadLine() + "'";
+                }
+                Console.WriteLine("Czy kobieta jest z parafii? (T/N)");
+                resp = Console.ReadLine();
+                if (resp == "T")
+                {
+                    Console.WriteLine("Podaj PESEL kobiety:");
+                    pesel_kobiety = " = '" + Console.ReadLine() + "'";
+                    dane_kobiety = " is NULL";
+                }
+                else if (resp == "N")
+                {
+                    Console.WriteLine("Podaj dane kobiety:");
+                    pesel_kobiety = " is NULL";
+                    dane_kobiety = " = '" + Console.ReadLine() + "'";
+                }
+                Console.WriteLine("Podaj starą datę ślubu (w formacie YYYY-MM-DD)");
+                string data = "date '" + Console.ReadLine() + "'";
+
+                Console.WriteLine("Podaj nową datę ślubu (w formacie YYYY-MM-DD)");
+                string newdata = "date '" + Console.ReadLine() + "'";
+
+                Console.WriteLine("Podaj dane I świadka:");
+                string s1 = "'" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj dane II świadka:");
+                string s2 = "'" + Console.ReadLine() + "'";
+
+                string join = "SELECT sa.id FROM sluby sl JOIN sakramenty sa ON sl.id_sakramentu = sa.id WHERE sa.data_udzielenia = " + data + " AND ";
+                join += "sl.maz" + pesel_mezczyzny + " AND sl.dane_meza" + dane_mezczyzny + " AND sl.zona" + pesel_kobiety;
+                join += " AND sl.dane_zony" + dane_kobiety;
+                Console.WriteLine("joinQuery " + join);
+                NpgsqlCommand command = new NpgsqlCommand(join, connection);
+                NpgsqlDataReader dr = null;
+                int id = 0;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    bool read = dr.Read();
+                    if (!read)
+                    {
+                        System.Console.WriteLine("Błąd, nie ma ślubu o podanych parametrach!");
+                        return;
+                    }
+                    for (int i = 0; i < dr.FieldCount; ++i)
+                        System.Console.WriteLine(i + " -> " + dr[i]);
+                    id = (int)dr[0];
+                }
+                catch (NpgsqlException exc)
+                {
+                    Console.WriteLine(exc.BaseMessage);
+                    return;
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                    dr = null;
+                }
+                string query = "UPDATE sluby SET maz ";
+                if (pesel_mezczyzny == " is NULL")
+                    query += "= NULL, dane_meza " + dane_mezczyzny +", ";
+                else
+                    query += pesel_mezczyzny + ", dane_meza = NULL, ";
+                query += "zona ";
+                if (pesel_kobiety == " is NULL")
+                    query += "= NULL, dane_zony " + dane_kobiety +", ";
+                else
+                    query += pesel_kobiety + ", dane_zony = NULL, ";
+                
+                query += "swiadek1 = " + s1 + ", swiadek2 = " + s2 + " WHERE id_sakramentu = " + id;
+                
+                command = new NpgsqlCommand(query, connection);
+                try
+                {
+                    dr = command.ExecuteReader();
+                }
+                catch (NpgsqlException exc)
+                {
+                    Console.WriteLine(exc.BaseMessage);
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+                query = "UPDATE sakramenty SET data_udzielenia = " + newdata + " WHERE id = " + id;
+                command = new NpgsqlCommand(query, connection);
+                try
+                {
+                    dr = command.ExecuteReader();
+                }
+                catch (NpgsqlException exc)
+                {
+                    Console.WriteLine(exc.BaseMessage);
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+            }
+
+            else if (answer == "pogrzeb")
+            {
+                Console.WriteLine("Podaj PESEL osoby zmarłej:");
+                string pesel = "'" + Console.ReadLine() + "'";
+                Console.WriteLine("Podaj datę śmierci (w formacie YYYY-MM-DD) albo wpisz \"nieznana\":");
+                string data_smierci = Console.ReadLine();
+                if (data_smierci == "nieznana")
+                    data_smierci = "null";
+                else
+                    data_smierci = "date '" + data_smierci + "'";
+                Console.WriteLine("Podaj datę pogrzebu:");
+                string data_pogrzebu = "date '" + Console.ReadLine() + "'";
+
+                NpgsqlCommand command = new NpgsqlCommand("UPDATE pogrzeby SET data_smierci = " + data_smierci + ", data_pogrzebu = " + data_pogrzebu + " WHERE osoba = " + pesel, connection);
+                NpgsqlDataReader dr = null;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    while (dr.Read()) ;
+                }
+                catch (NpgsqlException exc)
+                {
+                    Console.WriteLine(exc.Message);
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+            }
         }
 
         public static void Main(string[] args)
