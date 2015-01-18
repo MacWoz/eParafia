@@ -49,7 +49,7 @@ namespace eParafia
             Console.WriteLine("Następnie postępuj według dalszych instrukcji.");
             Console.WriteLine("\n\n");
 
-            Console.WriteLine("Aby wyświetlić odpowiednie informacje wpisz \"wyswietl\".");
+            Console.WriteLine("Aby wyświetlić odpowiednie informacje wpisz \"wyswietl\".\n");
             Console.WriteLine("Następnie postępuj według dalszych instrukcji.");
             Console.WriteLine("\n\n");
 
@@ -614,14 +614,16 @@ namespace eParafia
         public static void ShowInfo()
         {
             Console.Write("Czy chcesz wyświetlić dla każdego parafianina wszystkie informacje o przyjętych przez niego sakramentach");
-            Console.Write("i o ewentualnym pogrzebie ?");
+            Console.Write(" i o ewentualnym pogrzebie ?\n");
             Console.Write("Albo czy chcesz wyświetlić informacje o wszystkich udzielonych w parafii sakramentach ");
-            Console.Write("i pogrzebach, bądź tylko na temat jednego z sakramentów (tylko pogrzebów)? Wybierz opcję: wpisz 0, 1 lub 2.\n");
+            Console.Write("i pogrzebach, bądź tylko na temat jednego z sakramentów (tylko pogrzebów)?\n");
+            Console.WriteLine("a może interesują Cię statystyki na temat udzielonych sakramentów?");
+            Console.WriteLine("Wybierz opcję: wpisz 0, 1, 2 lub 3.");
             string answer = Console.ReadLine();
             if (answer == "0")
             {
                 answer = "parafianie";
-                GetInfo(0, 0, "parafianie");
+                GetInfo(0, 0, answer);
                 return;
             }
             else if (answer == "1")
@@ -631,6 +633,96 @@ namespace eParafia
                 Console.WriteLine("Jakie informacje chcesz uzyskać ?");
                 Console.WriteLine("Wpisz odpowiednio : \"chrzty\", \"pierwsze komunie\", \"bierzmowania\", \"sluby\" lub \"pogrzeby\".");
                 answer = Console.ReadLine();
+            }
+
+            else if (answer == "3")
+            {
+                Console.WriteLine("Czy chcesz uzyskać statystyki na temat tylko jednego sakramentu/tylko pogrzebów, czy na temat wszystkich sakramentów i pogrzebów?");
+                Console.WriteLine("Wpisz odpowiednio 0 albo 1.");
+                string caseString = Console.ReadLine();
+                if (caseString == "0")
+                {
+                    Console.WriteLine("Jakie informacje chcesz uzyskać ?");
+                    Console.WriteLine("Wpisz odpowiednio : \"chrzty\", \"pierwsze komunie\", \"bierzmowania\", \"sluby\" lub \"pogrzeby\".");
+                    caseString = Console.ReadLine();
+                    if (caseString == "chrzty")
+                    {
+                        Console.WriteLine("Jeśli chcesz wyswietlić informacje od pewnego roku, wpisz go teraz.");
+                        Console.WriteLine("Jeśli chcesz wyświetlić informacje zebrane od początku, wpisz 0.");
+                        int startyear = int.Parse(Console.ReadLine());
+
+                        Console.WriteLine("Jeśli chcesz wyswietlić informacje do pewnego roku, wpisz go teraz.");
+                        Console.WriteLine("Jeśli chcesz wyświetlić informacje zebrane do chwili obecnej, wpisz 0.");
+                        int endyear = int.Parse(Console.ReadLine());
+                        Count(startyear, endyear, caseString);
+                        return;
+                    }
+
+                    else if (caseString == "pierwsze komunie")
+                    {
+                        Console.WriteLine("Jeśli chcesz wyswietlić informacje od pewnego roku, wpisz go teraz.");
+                        Console.WriteLine("Jeśli chcesz wyświetlić informacje zebrane od początku, wpisz 0.");
+                        int startyear = int.Parse(Console.ReadLine());
+
+                        Console.WriteLine("Jeśli chcesz wyswietlić informacje do pewnego roku, wpisz go teraz.");
+                        Console.WriteLine("Jeśli chcesz wyświetlić informacje zebrane do chwili obecnej, wpisz 0.");
+                        int endyear = int.Parse(Console.ReadLine());
+                        Count(startyear, endyear, caseString);
+                        return;
+                    }
+
+                    else if (caseString == "bierzmowania")
+                    {
+                        Console.WriteLine("Jeśli chcesz wyswietlić informacje od pewnego roku, wpisz go teraz.");
+                        Console.WriteLine("Jeśli chcesz wyświetlić informacje zebrane od początku, wpisz 0.");
+                        int startyear = int.Parse(Console.ReadLine());
+
+                        Console.WriteLine("Jeśli chcesz wyswietlić informacje do pewnego roku, wpisz go teraz.");
+                        Console.WriteLine("Jeśli chcesz wyświetlić informacje zebrane do chwili obecnej, wpisz 0.");
+                        int endyear = int.Parse(Console.ReadLine());
+                        Count(startyear, endyear, caseString);
+                        return;
+                    }
+
+                    else if (caseString == "sluby")
+                    {
+                        Console.WriteLine("Jeśli chcesz wyswietlić informacje od pewnego roku, wpisz go teraz.");
+                        Console.WriteLine("Jeśli chcesz wyświetlić informacje zebrane od początku, wpisz 0.");
+                        int startyear = int.Parse(Console.ReadLine());
+
+                        Console.WriteLine("Jeśli chcesz wyswietlić informacje do pewnego roku, wpisz go teraz.");
+                        Console.WriteLine("Jeśli chcesz wyświetlić informacje zebrane do chwili obecnej, wpisz 0.");
+                        int endyear = int.Parse(Console.ReadLine());
+                        Count(startyear, endyear, caseString);
+                        return;
+                    }
+
+                    else if (caseString == "pogrzeby")
+                    {
+                        Console.WriteLine("Jeśli chcesz wyswietlić informacje od pewnego roku, wpisz go teraz.");
+                        Console.WriteLine("Jeśli chcesz wyświetlić informacje zebrane od początku, wpisz 0.");
+                        int startyear = int.Parse(Console.ReadLine());
+
+                        Console.WriteLine("Jeśli chcesz wyswietlić informacje do pewnego roku, wpisz go teraz.");
+                        Console.WriteLine("Jeśli chcesz wyświetlić informacje zebrane do chwili obecnej, wpisz 0.");
+                        int endyear = int.Parse(Console.ReadLine());
+                        Count(startyear, endyear, caseString);
+                        return;
+                    }
+                }
+
+                else if (caseString == "1")
+                {
+                    Console.WriteLine("Jeśli chcesz wyswietlić informacje od pewnego roku, wpisz go teraz.");
+                    Console.WriteLine("Jeśli chcesz wyświetlić informacje zebrane od początku, wpisz 0.");
+                    int startyear = int.Parse(Console.ReadLine());
+
+                    Console.WriteLine("Jeśli chcesz wyswietlić informacje do pewnego roku, wpisz go teraz.");
+                    Console.WriteLine("Jeśli chcesz wyświetlić informacje zebrane do chwili obecnej, wpisz 0.");
+                    int endyear = int.Parse(Console.ReadLine());
+                    Count(startyear, endyear, "all");
+                }
+                return;
             }
 
             Console.WriteLine("Jeśli chcesz wyswietlić informacje od pewnego roku, wpisz go teraz.");
@@ -687,16 +779,23 @@ namespace eParafia
             }
             else if (type == "all")
             {
-                string query = "SELECT * from chrzty c JOIN sakramenty s ON s.id = c.id_sakramentu WHERE s.powiazany = TRUE";
-                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                Console.WriteLine("Chrzty:");
+                GetInfo(start, end, "chrzty");
+                Console.WriteLine("Pierwsze Komunie:");
+                GetInfo(start, end, "pierwsze komunie");
+                Console.WriteLine("Bierzmowania:");
+                GetInfo(start, end, "bierzmowania");
+                Console.WriteLine("Śluby:");
+                GetInfo(start, end, "sluby");
+                Console.WriteLine("Pogrzeby:");
+                GetInfo(start, end, "pogrzeby");
             }
 
             else if (type == "chrzty")
             {
                 string query = "SELECT p.imie||' '||p.nazwisko||' (pesel: '||p.pesel||')', 'ochrzczony dnia '||s.data_udzielenia,";
-                query += "'ojciec chrzestny: '||s1.dane, 'matka chrzestna: '||s2.dane";
-                query += " FROM (((parafianie p JOIN chrzty c ON p.pesel = c.osoba) JOIN sakramenty s ON s.id = c.id_sakramentu)";
-                query += " JOIN swiadkowie s1 ON s1.id = c.ojciec_chrzestny) JOIN swiadkowie s2 ON s2.id = c.matka_chrzestna";
+                query += "'ojciec chrzestny: '||c.ojciec_chrzestny, 'matka chrzestna: '||c.matka_chrzestna";
+                query += " FROM ((parafianie p JOIN chrzty c ON p.pesel = c.osoba) JOIN sakramenty s ON s.id = c.id_sakramentu)";
                 query += " WHERE s.powiazany = TRUE";
                 if (start != 0)
                 {
@@ -758,9 +857,8 @@ namespace eParafia
             else if (type == "bierzmowania")
             {
                 string query = "SELECT p.imie||' '||p.nazwisko||' (pesel: '||p.pesel||')', 'przyjął/przyjęła bierzmowanie";
-                query += " dnia '||s.data_udzielenia, 'swiadek: '||sw.dane";
-                query += " FROM ((parafianie p JOIN bierzmowania b ON p.pesel = b.osoba) JOIN sakramenty s ON s.id = b.id_sakramentu)";
-                query += " JOIN swiadkowie sw ON sw.id = b.swiadek";
+                query += " dnia '||s.data_udzielenia, 'swiadek: '||b.swiadek";
+                query += " FROM (parafianie p JOIN bierzmowania b ON p.pesel = b.osoba) JOIN sakramenty s ON s.id = b.id_sakramentu";
                 query += " WHERE s.powiazany = TRUE";
                 if (start != 0)
                 {
@@ -791,9 +889,8 @@ namespace eParafia
             else if (type == "sluby")
             {
                 string query = "SELECT sl.maz, sl.dane_meza, (SELECT CASE WHEN sl.maz IS NOT NULL THEN imie||' '||nazwisko END FROM parafianie WHERE pesel = sl.maz), sl.zona, sl.dane_zony, ";
-                query += " (SELECT CASE WHEN sl.zona IS NOT NULL THEN imie||' '||nazwisko END FROM parafianie WHERE pesel = sl.zona), s1.dane, s2.dane, sl.uniewazniony, s.data_udzielenia";
-                query += " FROM ((sluby sl JOIN sakramenty s ON sl.id_sakramentu = s.id) JOIN swiadkowie s1 ON s1.id = sl.swiadek1)";
-                query += " JOIN swiadkowie s2 ON s2.id = sl.swiadek2";
+                query += " (SELECT CASE WHEN sl.zona IS NOT NULL THEN imie||' '||nazwisko END FROM parafianie WHERE pesel = sl.zona), sl.swiadek1, sl.swiadek2, sl.uniewazniony, s.data_udzielenia";
+                query += " FROM sluby sl JOIN sakramenty s ON sl.id_sakramentu = s.id";
                 if (start != 0)
                 {
                     query += " AND (SELECT date_part('year', s.data_udzielenia) >= " + start + ")";
@@ -866,10 +963,189 @@ namespace eParafia
             }
         }
 
+        public static long Count(int start, int end, string type)
+        {
+            if (type == "all")
+            {
+                long count = Count(start, end, "chrzty") + Count(start, end, "pierwsze komunie") + Count(start, end, "bierzmowania") + Count(start, end, "sluby");
+                long pog = Count(start, end, "pogrzeby");
+                if (start == end)
+                    Console.WriteLine("W roku " + start + " udzielono razem " + count + " sakramentów i " + pog + " pogrzebów.");
+                else
+                    Console.WriteLine("Od roku " + start + " do roku " + end + " udzielono razem " + count + " sakramentów i " + pog + " pogrzebów.");
+                return 0;
+            }
+
+            else if (type == "chrzty")
+            {
+                string query = "SELECT count(*) FROM sakramenty s JOIN chrzty c ON s.id = c.id_sakramentu WHERE s.powiazany = TRUE";
+                if (start != 0)
+                {
+                    query += " AND (SELECT date_part('year', s.data_udzielenia) >= " + start + ")";
+                }
+                if (end != 0)
+                {
+                    query += " AND (SELECT date_part('year', s.data_udzielenia) <= " + end + ")";
+                }
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                NpgsqlDataReader dr = null;
+                long count = 0;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    dr.Read();
+                    count = (long)dr[0];
+                    if (start == end)
+                        Console.WriteLine("W roku " + start + " udzielono " + count + " chrztów.");
+                    else
+                        Console.WriteLine("Od roku " + start + " do roku " + end + " udzielono " + count + " chrztów.");
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+                return count;
+            }
+
+            else if (type == "pierwsze komunie")
+            {
+                string query = "SELECT count(*) FROM sakramenty s JOIN pierwsze_komunie pk ON s.id = pk.id_sakramentu WHERE s.powiazany = TRUE";
+                if (start != 0)
+                {
+                    query += " AND (SELECT date_part('year', s.data_udzielenia) >= " + start + ")";
+                }
+                if (end != 0)
+                {
+                    query += " AND (SELECT date_part('year', s.data_udzielenia) <= " + end + ")";
+                }
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                NpgsqlDataReader dr = null;
+                long count = 0;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    dr.Read();
+                    count = (long)dr[0];
+                    if (start == end)
+                        Console.WriteLine("W roku " + start + " udzielono " + count + " Pierwszych Komunii.");
+                    else
+                        Console.WriteLine("Od roku " + start + " do roku " + end + " udzielono " + count + " Pierwszych Komunii.");
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+                return count;
+            }
+
+            else if (type == "bierzmowania")
+            {
+                string query = "SELECT count(*) FROM sakramenty s JOIN bierzmowania b ON s.id = b.id_sakramentu WHERE s.powiazany = TRUE";
+                if (start != 0)
+                {
+                    query += " AND (SELECT date_part('year', s.data_udzielenia) >= " + start + ")";
+                }
+                if (end != 0)
+                {
+                    query += " AND (SELECT date_part('year', s.data_udzielenia) <= " + end + ")";
+                }
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                NpgsqlDataReader dr = null;
+                long count = 0;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    dr.Read();
+                    count = (long)dr[0];
+                    if (start == end)
+                        Console.WriteLine("W roku " + start + " udzielono " + count + " bierzmowań.");
+                    else
+                        Console.WriteLine("Od roku " + start + " do roku " + end + " udzielono " + count + " bierzmowań.");
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+                return count;
+            }
+
+            else if (type == "sluby")
+            {
+                string query = "SELECT count(*) FROM sakramenty s JOIN sluby sl ON s.id = sl.id_sakramentu WHERE s.powiazany = TRUE";
+                if (start != 0)
+                {
+                    query += " AND (SELECT date_part('year', s.data_udzielenia) >= " + start + ")";
+                }
+                if (end != 0)
+                {
+                    query += " AND (SELECT date_part('year', s.data_udzielenia) <= " + end + ")";
+                }
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                NpgsqlDataReader dr = null;
+                long count = 0;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    dr.Read();
+                    count = (long)dr[0];
+                    if (start == end)
+                        Console.WriteLine("W roku " + start + " udzielono " + count + " ślubów.");
+                    else
+                        Console.WriteLine("Od roku " + start + " do roku " + end + " udzielono " + count + " ślubów.");
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+                return count;
+            }
+
+            else if (type == "pogrzeby")
+            {
+                string query = "SELECT count(*) FROM pogrzeby p";
+                if (start != 0)
+                {
+                    query += " WHERE (SELECT date_part('year', p.data_pogrzebu) >= " + start + ")";
+                }
+                if (end != 0 && start != 0)
+                {
+                    query += " AND (SELECT date_part('year', p.data_pogrzebu) <= " + end + ")";
+                }
+                else if (end != 0)
+                {
+                    query += " WHERE (SELECT date_part('year', p.data_pogrzebu) <= " + end + ")";
+                }
+                NpgsqlCommand command = new NpgsqlCommand(query, connection);
+                NpgsqlDataReader dr = null;
+                long count = 0;
+                try
+                {
+                    dr = command.ExecuteReader();
+                    dr.Read();
+                    count = (long)dr[0];
+                    if (start == end)
+                        Console.WriteLine("W roku " + start + " udzielono " + count + " pogrzebów.");
+                    else
+                        Console.WriteLine("Od roku " + start + " do roku " + end + " udzielono " + count + " pogrzebów.");
+                }
+                finally
+                {
+                    if (dr != null)
+                        dr.Close();
+                }
+                return count;
+            }
+            return 0;
+        }
+
         public static void Main(string[] args)
         {
             Console.WriteLine("Witaj w aplikacji eParafia!");
-            while(logged == false)
+            while (logged == false)
                 LogIn();
             Console.WriteLine("Pomyślnie zalogowano.");
             Console.WriteLine("Aby wyświetlić instrukcję, wpisz \"manual\".");

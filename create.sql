@@ -492,13 +492,13 @@ CREATE VIEW all_parafianie as
 	(SELECT s.data_udzielenia FROM sakramenty s JOIN pierwsze_komunie pk ON pk.id_sakramentu = s.id WHERE pk.osoba = p.pesel) as pierwsza_komunia,
 	(SELECT s.data_udzielenia FROM sakramenty s JOIN bierzmowania b ON b.id_sakramentu = s.id WHERE b.osoba = p.pesel) as bierzmowanie,
 	(SELECT s.data_udzielenia FROM sakramenty s JOIN sluby sl ON sl.id_sakramentu = s.id WHERE sl.maz = p.pesel or sl.zona = p.pesel) as data_slubu,
-	(SELECT CASE WHEN p.pesel = sl.maz THEN CASE WHEN sl.zona is null THEN sl.dane_zony||' (osoba spoza parafii)' ELSE (SELECT par.imie||' '||par.nazwisko FROM parafianie par WHERE par.pesel = sl.zona)||' (PESEL: '||sl.zona||')' END
-		ELSE CASE WHEN sl.maz is null THEN sl.dane_meza||' (osoba spoza parafii)' ELSE (SELECT par.imie||' '||par.nazwisko FROM parafianie par WHERE par.pesel = sl.maz)||' (PESEL: '||sl.maz||')' END END 
+	(SELECT CASE WHEN p.pesel = sl.maz THEN CASE WHEN sl.zona is null THEN sl.dane_zony||' (osoba spoza parafii)' ELSE (SELECT par.imie||' '||par.nazwisko FROM parafianie par WHERE par.pesel = sl.zona)||' (PESEL: '||sl.zona||')'||(CASE WHEN sl.uniewazniony = TRUE THEN ' (uniewazniony)' END) END
+		ELSE CASE WHEN sl.maz is null THEN sl.dane_meza||' (osoba spoza parafii)' ELSE (SELECT par.imie||' '||par.nazwisko FROM parafianie par WHERE par.pesel = sl.maz)||' (PESEL: '||sl.maz||')'||(CASE WHEN sl.uniewazniony = TRUE THEN ' (uniewazniony)' END) END END 
 		FROM sakramenty s JOIN sluby sl ON sl.id_sakramentu = s.id WHERE sl.maz = p.pesel or sl.zona = p.pesel) as malzonek,
 	(SELECT pog.data_smierci FROM pogrzeby pog WHERE pog.osoba = p.pesel) as data_smierci,
 	(SELECT pog.data_pogrzebu FROM pogrzeby pog WHERE pog.osoba = p.pesel) as pogrzeb
 	FROM parafianie p;
-	
+
 BEGIN;
 
 SELECT insert_chrzty ('31022213752', 'Lula', 'Edmund', date '1931-02-22', 'M', null, null, to_date('4 Jun 1931', 'DD Mon YYYY'), 'Edmund Mariusz', 'Stanislaw Lula', 'Karolina Jablecka');
