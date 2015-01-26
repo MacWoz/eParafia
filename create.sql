@@ -13,10 +13,20 @@ CREATE OR REPLACE FUNCTION check_ok(id INTEGER) RETURNS BOOLEAN AS $$
 		SELECT INTO b2 EXISTS (SELECT * FROM pierwsze_komunie p WHERE p.id_sakramentu = id);
 		SELECT INTO b3 EXISTS (SELECT * FROM bierzmowania b WHERE b.id_sakramentu = id);
 		SELECT INTO b4 EXISTS (SELECT * FROM sluby s WHERE s.id_sakramentu = id);
-		IF b1 = FALSE AND b2 = FALSE AND b3 = FALSE AND b4 = FALSE THEN
-			RETURN FALSE;
+		IF b1 = TRUE AND b2 = FALSE AND b3 = FALSE AND b4 = FALSE THEN
+			RETURN TRUE;
 		END IF;
-		RETURN TRUE;
+		IF b1 = FALSE AND b2 = TRUE AND b3 = FALSE AND b4 = FALSE THEN
+			RETURN TRUE;
+		END IF;
+		IF b1 = FALSE AND b2 = FALSE AND b3 = TRUE AND b4 = FALSE THEN
+			RETURN TRUE;
+		END IF;
+		IF b1 = FALSE AND b2 = FALSE AND b3 = FALSE AND b4 = TRUE THEN
+			RETURN TRUE;
+		END IF;
+
+		RETURN FALSE;
 	END
 $$ LANGUAGE plpgsql;
 
@@ -353,14 +363,14 @@ CREATE OR REPLACE FUNCTION check_slub_update() RETURNS trigger AS $check_slub_up
 	DECLARE r RECORD;
 	DECLARE rec RECORD;
     BEGIN
-    	IF NEW.maz IS NOT NULL THEN
+    	IF NEW.maz IS NOT NULL AND NEW.maz != OLD.maz THEN
 		    SELECT INTO r * FROM bierzmowania b join sakramenty s on s.id = b.id_sakramentu WHERE b.osoba = NEW.maz LIMIT 1;
 	        IF r.data_udzielenia > (SELECT data_udzielenia FROM sakramenty where id = NEW.id_sakramentu) THEN
 	        	RAISE EXCEPTION 'Zla data slubu!';
 	        END IF;
 		    IF (SELECT EXISTS (SELECT 1 from sluby where maz = NEW.maz AND uniewazniony = FALSE)) = TRUE THEN
-		    	FOR rec IN SELECT zona FROM sluby WHERE maz = NEW.maz AND uniewazniony = FALSE LOOP
-		    		IF (SELECT EXISTS (SELECT * FROM pogrzeby WHERE osoba = zona)) = FALSE THEN
+		    	FOR rec IN SELECT sl.zona FROM sluby sl WHERE sl.maz = NEW.maz AND uniewazniony = FALSE LOOP
+		    		IF (SELECT EXISTS (SELECT * FROM pogrzeby WHERE osoba = rec.zona)) = FALSE THEN
 		    			RAISE EXCEPTION 'Mezczyzna jest juz w innym zwiazku malzenskim!';
 		    		END IF;
 		    	END LOOP;
@@ -370,23 +380,14 @@ CREATE OR REPLACE FUNCTION check_slub_update() RETURNS trigger AS $check_slub_up
 		    END IF;
 		END IF;
 
-		IF NEW.zona IS NOT NULL THEN
-		    IF (SELECT EXISTS (SELECT 1 from chrzty where osoba = NEW.zona)) = FALSE THEN 
-		    	RAISE EXCEPTION 'Osoba nie jest jeszcze ochrzczona!';
-		    END IF;
-			IF (SELECT EXISTS (SELECT 1 from pierwsze_komunie where osoba = NEW.zona)) = FALSE THEN 
-		    	RAISE EXCEPTION 'Osoba nie przyjela jeszcze pierwszej Komunii!';
-		    END IF;
-		    IF (SELECT EXISTS (SELECT 1 from bierzmowania where osoba = NEW.zona)) = FALSE THEN 
-		    	RAISE EXCEPTION 'Osoba nie przyjela jeszcze bierzmowania!';
-		    END IF;
+		IF NEW.zona IS NOT NULL AND NEW.zona != OLD.zona THEN
 		    SELECT INTO r * FROM bierzmowania b join sakramenty s on s.id = b.id_sakramentu WHERE b.osoba = NEW.zona LIMIT 1;
 	        IF r.data_udzielenia > (SELECT data_udzielenia FROM sakramenty where id = NEW.id_sakramentu) THEN
 	        	RAISE EXCEPTION 'Zla data slubu!';
 	        END IF;
 		    IF (SELECT EXISTS (SELECT 1 from sluby where zona = NEW.zona AND uniewazniony = FALSE)) = TRUE THEN
 		    	FOR rec IN SELECT maz FROM sluby WHERE zona = NEW.zona AND uniewazniony = FALSE LOOP
-		    		IF (SELECT EXISTS (SELECT * FROM pogrzeby WHERE osoba = maz)) = FALSE THEN
+		    		IF (SELECT EXISTS (SELECT 1 FROM pogrzeby WHERE osoba = rec.maz)) = FALSE THEN
 		    			RAISE EXCEPTION 'Kobieta jest juz w innym zwiazku malzenskim!';
 		    		END IF;
 		    	END LOOP;

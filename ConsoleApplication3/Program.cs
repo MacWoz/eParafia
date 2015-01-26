@@ -37,7 +37,7 @@ namespace eParafia
             Console.WriteLine("\t" + "\"slub\"" + " - Aby dodać informacje o udzielonym ślubie.");
             Console.WriteLine("\t" + "\"pogrzeb\"" + " - Aby dodać informacje o pogrzebie.");
             Console.WriteLine("Następnie postępuj według dalszych instrukcji.");
-            Console.WriteLine("\n\n");
+            Console.WriteLine();
 
             Console.WriteLine("Aby usunąć odpowiednie informacje, wpisz:");
             Console.WriteLine("\t" + "\"usun osobe\"" + " - Aby usunąć informacje o parafianinie i wszystkie informacje z nim związane.");
@@ -47,14 +47,14 @@ namespace eParafia
             Console.WriteLine("\t" + "\"usun pogrzeb\"" + " - Aby usunąć informacje o pogrzebie.");
             Console.WriteLine("Aby unieważnić ślub, wpisz \"uniewaznij slub\".");
             Console.WriteLine("Następnie postępuj według dalszych instrukcji.");
-            Console.WriteLine("\n\n");
+            Console.WriteLine();
 
             Console.WriteLine("Aby wyświetlić odpowiednie informacje wpisz \"wyswietl\".\n");
             Console.WriteLine("Następnie postępuj według dalszych instrukcji.");
 
             Console.WriteLine("Aby poprawić błędne dane wpisz \"popraw\".\n");
             Console.WriteLine("Następnie postępuj według dalszych instrukcji.");
-            Console.WriteLine("\n\n");
+            Console.WriteLine();
 
             Console.WriteLine("Inne polecenia nie będą rozpoznane przez aplikację.");
         }
@@ -114,6 +114,7 @@ namespace eParafia
         {
             Console.WriteLine("Podaj imię:");
             string imie = "'" + Console.ReadLine() + "'";
+            imie = "'" + imie + "'";
             Console.WriteLine("Podaj nazwisko:");
             string nazwisko = "'" + Console.ReadLine() + "'";
             Console.WriteLine("Podaj PESEL:");
@@ -975,8 +976,10 @@ namespace eParafia
             {
                 long count = Count(start, end, "chrzty") + Count(start, end, "pierwsze komunie") + Count(start, end, "bierzmowania") + Count(start, end, "sluby");
                 long pog = Count(start, end, "pogrzeby");
-                if (start == end)
+                if ((start == end) && (start != 0))
                     Console.WriteLine("W roku " + start + " udzielono razem " + count + " sakramentów i " + pog + " pogrzebów.");
+                else if ((start == end) && (start == 0))
+                    Console.WriteLine("W parafii udzielono razem " + count + " sakramentów i " + pog + " pogrzebów.");
                 else
                     Console.WriteLine("Od roku " + start + " do roku " + end + " udzielono razem " + count + " sakramentów i " + pog + " pogrzebów.");
                 return 0;
@@ -1001,8 +1004,10 @@ namespace eParafia
                     dr = command.ExecuteReader();
                     dr.Read();
                     count = (long)dr[0];
-                    if (start == end)
+                    if ((start == end) && (start != 0))
                         Console.WriteLine("W roku " + start + " udzielono " + count + " chrztów.");
+                    else if ((start == end) && (start == 0))
+                        Console.WriteLine("W parafii udzielono razem " + count + " chrztów.");
                     else
                         Console.WriteLine("Od roku " + start + " do roku " + end + " udzielono " + count + " chrztów.");
                 }
@@ -1033,8 +1038,10 @@ namespace eParafia
                     dr = command.ExecuteReader();
                     dr.Read();
                     count = (long)dr[0];
-                    if (start == end)
+                    if ((start == end) && (start != 0))
                         Console.WriteLine("W roku " + start + " udzielono " + count + " Pierwszych Komunii.");
+                    else if ((start == end) && (start == 0))
+                        Console.WriteLine("W parafii udzielono razem " + count + " Pierwszych Komunii.");
                     else
                         Console.WriteLine("Od roku " + start + " do roku " + end + " udzielono " + count + " Pierwszych Komunii.");
                 }
@@ -1065,8 +1072,10 @@ namespace eParafia
                     dr = command.ExecuteReader();
                     dr.Read();
                     count = (long)dr[0];
-                    if (start == end)
+                    if ((start == end) && (start != 0))
                         Console.WriteLine("W roku " + start + " udzielono " + count + " bierzmowań.");
+                    else if ((start == end) && (start == 0))
+                        Console.WriteLine("W parafii udzielono razem " + count + " bierzmowań.");
                     else
                         Console.WriteLine("Od roku " + start + " do roku " + end + " udzielono " + count + " bierzmowań.");
                 }
@@ -1097,8 +1106,10 @@ namespace eParafia
                     dr = command.ExecuteReader();
                     dr.Read();
                     count = (long)dr[0];
-                    if (start == end)
+                    if ((start == end) && (start != 0))
                         Console.WriteLine("W roku " + start + " udzielono " + count + " ślubów.");
+                    else if ((start == end) && (start == 0))
+                        Console.WriteLine("W parafii udzielono razem " + count + " ślubów.");
                     else
                         Console.WriteLine("Od roku " + start + " do roku " + end + " udzielono " + count + " ślubów.");
                 }
@@ -1133,8 +1144,10 @@ namespace eParafia
                     dr = command.ExecuteReader();
                     dr.Read();
                     count = (long)dr[0];
-                    if (start == end)
+                    if ((start == end) && (start != 0))
                         Console.WriteLine("W roku " + start + " udzielono " + count + " pogrzebów.");
+                    else if ((start == end) && (start == 0))
+                        Console.WriteLine("W parafii udzielono razem " + count + " pogrzebów.");
                     else
                         Console.WriteLine("Od roku " + start + " do roku " + end + " udzielono " + count + " pogrzebów.");
                 }
@@ -1156,7 +1169,7 @@ namespace eParafia
             if (answer == "dane")
             {
                 Console.WriteLine("Podaj PESEL osoby, której informacje chcesz poprawić.");
-                string pesel = Console.ReadLine();
+                string pesel = "'" +  Console.ReadLine() + "'";
                 Console.WriteLine("Podaj imię:");
                 string imie = "'" + Console.ReadLine() + "'";
                 Console.WriteLine("Podaj nazwisko:");
@@ -1182,6 +1195,7 @@ namespace eParafia
                 
                 string query = "UPDATE parafianie SET pesel = " + new_pesel + ", nazwisko = " + nazwisko + ", imie = " + imie + ", data_urodzenia = " + data_urodzenia + ", plec = " + plec + ", ";
                 query += "ojciec = " + ojciec_pesel + ", matka = " + matka_pesel + ", data_urodzenia = " + data_urodzenia + " WHERE pesel = " + pesel;
+                Console.WriteLine(query);
                 NpgsqlCommand command = new NpgsqlCommand(query, connection);
                 NpgsqlDataReader dr = null;
                 try
@@ -1249,7 +1263,7 @@ namespace eParafia
                     if (dr != null)
                         dr.Close();
                 }
-                query = "UPDATE skaramenty SET data_udzielenia = " + data + " WHERE id = " + id;
+                query = "UPDATE sakramenty SET data_udzielenia = " + data + " WHERE id = " + id;
                 command = new NpgsqlCommand(query, connection);
                 dr = null;
                 try
@@ -1294,7 +1308,7 @@ namespace eParafia
                     if (dr != null)
                         dr.Close();
                 }
-                query = "UPDATE skaramenty SET data_udzielenia = " + data + " WHERE id = " + id;
+                query = "UPDATE sakramenty SET data_udzielenia = " + data + " WHERE id = " + id;
                 command = new NpgsqlCommand(query, connection);
                 dr = null;
                 try
@@ -1322,7 +1336,7 @@ namespace eParafia
                 string imie = "'" + Console.ReadLine() + "'";
                 Console.WriteLine("Podaj imię i nazwisko świadka:");
                 string swiadek = "'" + Console.ReadLine() + "'";
-                Console.WriteLine("Podaj datę chrztu (w formacie YYYY-MM-DD):");
+                Console.WriteLine("Podaj datę bierzmowania (w formacie YYYY-MM-DD):");
                 string data = "date '" + Console.ReadLine() + "'";
                 string query = "UPDATE bierzmowania SET imie_bierzmowania = " + imie + ", swiadek = " + swiadek + " WHERE osoba = " + pesel;
                 NpgsqlCommand command = new NpgsqlCommand(query, connection);
@@ -1362,7 +1376,7 @@ namespace eParafia
                     if (dr != null)
                         dr.Close();
                 }
-                query = "UPDATE skaramenty SET data_udzielenia = " + data + " WHERE id = " + id;
+                query = "UPDATE sakramenty SET data_udzielenia = " + data + " WHERE id = " + id;
                 command = new NpgsqlCommand(query, connection);
                 dr = null;
                 try
@@ -1458,19 +1472,10 @@ namespace eParafia
                         dr.Close();
                     dr = null;
                 }
-                string query = "UPDATE sluby SET maz ";
-                if (pesel_mezczyzny == " is NULL")
-                    query += "= NULL, dane_meza " + dane_mezczyzny +", ";
-                else
-                    query += pesel_mezczyzny + ", dane_meza = NULL, ";
-                query += "zona ";
-                if (pesel_kobiety == " is NULL")
-                    query += "= NULL, dane_zony " + dane_kobiety +", ";
-                else
-                    query += pesel_kobiety + ", dane_zony = NULL, ";
-                
+                string query = "UPDATE sluby SET ";                
                 query += "swiadek1 = " + s1 + ", swiadek2 = " + s2 + " WHERE id_sakramentu = " + id;
-                
+                Console.WriteLine("query 2 : " + query);
+
                 command = new NpgsqlCommand(query, connection);
                 try
                 {
@@ -1478,7 +1483,7 @@ namespace eParafia
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine(exc.BaseMessage);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage);
                 }
                 finally
                 {
