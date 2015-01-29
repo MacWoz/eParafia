@@ -114,7 +114,6 @@ namespace eParafia
         {
             Console.WriteLine("Podaj imię:");
             string imie = "'" + Console.ReadLine() + "'";
-            imie = "'" + imie + "'";
             Console.WriteLine("Podaj nazwisko:");
             string nazwisko = "'" + Console.ReadLine() + "'";
             Console.WriteLine("Podaj PESEL:");
@@ -145,17 +144,19 @@ namespace eParafia
             string dane_matki = "'" + Console.ReadLine() + "'";
             string query = "SELECT insert_chrzty(" + pesel + ", " + nazwisko +  ", " + imie + ", " + data_urodzenia + ", " + plec + ", ";
             query += ojciec_pesel + ", " + matka_pesel + ", " + data + ", " + imiona + ", " + dane_ojca + ", " + dane_matki + ")";
-            System.Console.WriteLine(query);
             NpgsqlCommand command = new NpgsqlCommand(query, connection);
             NpgsqlDataReader dr = null;
+            Console.WriteLine(query);
             try
             {
                 dr = command.ExecuteReader();
                 while (dr.Read()) ;
+                Console.WriteLine("OK, pomyślnie dodano nowego parafianina.");
             }
             catch (NpgsqlException exc)
             {
-                Console.WriteLine(exc.BaseMessage);
+                Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                Console.WriteLine("Nic nie dodano.");
             }
             finally
             {
@@ -171,16 +172,17 @@ namespace eParafia
             string data = "date '" + Console.ReadLine() + "'";
             string query = "SELECT insert_komunie (" + data + ", " + pesel + ")";
             NpgsqlCommand command = new NpgsqlCommand(query, connection);
-            Console.WriteLine("query " + query);
             NpgsqlDataReader dr = null;
             try
             {
                 dr = command.ExecuteReader();
                 while (dr.Read()) ;
+                Console.WriteLine("OK, pomyślnie dodano nową I Komunię.");
             }
             catch (NpgsqlException exc)
             {
-                Console.WriteLine(exc.BaseMessage);
+                Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                Console.WriteLine("Nic nie dodano.");
             }
             finally
             {
@@ -200,16 +202,17 @@ namespace eParafia
             string swiadek = "'" + Console.ReadLine() + "'";
             string query = "SELECT insert_bierzmowania(" + data + ", " + pesel + ", " + imie + ", " + swiadek + ")";
             NpgsqlCommand command = new NpgsqlCommand(query, connection);
-            Console.WriteLine("query " + query);
             NpgsqlDataReader dr = null;
             try
             {
                 dr = command.ExecuteReader();
                 while (dr.Read()) ;
+                Console.WriteLine("OK, pomyślnie dodano nowe bierzmowanie.");
             }
             catch (NpgsqlException exc)
             {
-                Console.WriteLine(exc.BaseMessage);
+                Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                Console.WriteLine("Nic nie dodano.");
             }
             finally
             {
@@ -260,16 +263,17 @@ namespace eParafia
             string query = "SELECT insert_sluby(" + data + ", " + pesel_mezczyzny + ", " + dane_mezczyzny + ", " + pesel_kobiety + ", ";
             query += dane_kobiety + ", " + swiadek1 + ", " + swiadek2 + ")";
             NpgsqlCommand command = new NpgsqlCommand(query, connection);
-            Console.WriteLine("query " + query);
             NpgsqlDataReader dr = null;
             try
             {
                 dr = command.ExecuteReader();
                 while (dr.Read()) ;
+                Console.WriteLine("OK, pomyślnie dodano nowy ślub.");
             }
             catch (NpgsqlException exc)
             {
-                Console.WriteLine(exc.BaseMessage);
+                Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                Console.WriteLine("Nic nie dodano.");
             }
             finally
             {
@@ -297,10 +301,12 @@ namespace eParafia
             {
                 dr = command.ExecuteReader();
                 while (dr.Read()) ;
+                Console.WriteLine("OK, pomyślnie dodano nowy pogrzeb.");
             }
             catch (NpgsqlException exc)
             {
-                Console.WriteLine(exc.Message);
+                Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                Console.WriteLine("Nic nie dodano.");
             }
             finally
             {
@@ -315,7 +321,6 @@ namespace eParafia
             string pesel = "'" + Console.ReadLine() + "'";
             string query = "DELETE FROM parafianie WHERE pesel=" + pesel;
             NpgsqlCommand command = new NpgsqlCommand(query, connection);
-            Console.WriteLine("query " + query);
             try
             {
                 int count = command.ExecuteNonQuery();
@@ -323,11 +328,16 @@ namespace eParafia
                 {
                     Console.WriteLine("Niepoprawny PESEL, nic nie usunięto.");
                 }
+                else
+                {
+                    Console.WriteLine("OK, poprawnie usunięto.");
+                }
 
             }
             catch (NpgsqlException exc)
             {
-                System.Console.WriteLine(exc.BaseMessage);
+                Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                Console.WriteLine("Nic nie usunięto.");
             }
         }
         public static void DeleteKomunie()
@@ -336,7 +346,6 @@ namespace eParafia
             string pesel = "'" + Console.ReadLine() + "'";
             string query = "SELECT id_sakramentu FROM pierwsze_komunie WHERE osoba = " + pesel + " LIMIT 1";
             NpgsqlCommand command = new NpgsqlCommand(query, connection);
-            Console.WriteLine("query " + query);
             NpgsqlDataReader dr = null;
             try
             {
@@ -347,7 +356,8 @@ namespace eParafia
             }
             catch (NpgsqlException exc)
             {
-                Console.WriteLine(exc.BaseMessage);
+                Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                Console.WriteLine("Nic nie usunięto.");
                 return;
             }
             finally
@@ -357,17 +367,17 @@ namespace eParafia
                 dr = null;
             }
             command = new NpgsqlCommand(query, connection);
-            Console.WriteLine("query2 " + query);
             try
             {
                 dr = command.ExecuteReader();
                 dr.Read();
-                for (int i = 0; i < dr.FieldCount; ++i)
-                    Console.WriteLine("{0} {1}\n", i, dr[i]);
+                Console.WriteLine("OK, poprawnie usunięto.");
             }
             catch (NpgsqlException exc)
             {
                 Console.WriteLine(exc.BaseMessage);
+                Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                Console.WriteLine("Nic nie usunięto.");
                 return;
             }
             finally
@@ -382,7 +392,6 @@ namespace eParafia
             string pesel = "'" + Console.ReadLine() + "'";
             string query = "SELECT id_sakramentu FROM bierzmowania WHERE osoba = " + pesel + " LIMIT 1";
             NpgsqlCommand command = new NpgsqlCommand(query, connection);
-            Console.WriteLine("query " + query);
             NpgsqlDataReader dr = null;
             int id = 0;
             try
@@ -393,7 +402,8 @@ namespace eParafia
             }
             catch (NpgsqlException exc)
             {
-                Console.WriteLine(exc.BaseMessage);
+                Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                Console.WriteLine("Nic nie usunięto.");
                 return;
             }
             finally
@@ -404,17 +414,16 @@ namespace eParafia
             }
             query = "DELETE FROM bierzmowania WHERE id_sakramentu = " + id;
             command = new NpgsqlCommand(query, connection);
-            Console.WriteLine("query2 " + query);
             try
             {
                 dr = command.ExecuteReader();
                 dr.Read();
-                for (int i = 0; i < dr.FieldCount; ++i)
-                    Console.WriteLine("{0} -> {1}\n", i, dr[i]);
+                Console.WriteLine("OK, pomyślnie usunięto.");
             }
             catch (NpgsqlException exc)
             {
-                Console.WriteLine(exc.BaseMessage);
+                Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                Console.WriteLine("Nic nie usunięto.");
             }
             finally
             {
@@ -462,7 +471,6 @@ namespace eParafia
             string join = "SELECT sa.id FROM sluby sl JOIN sakramenty sa ON sl.id_sakramentu = sa.id WHERE sa.data_udzielenia = "+ data + " AND ";
             join += "sl.maz" + pesel_mezczyzny + " AND sl.dane_meza" + dane_mezczyzny + " AND sl.zona" + pesel_kobiety;
             join += " AND sl.dane_zony" + dane_kobiety; 
-            Console.WriteLine("joinQuery " + join);
             NpgsqlCommand command = new NpgsqlCommand(join, connection);
             NpgsqlDataReader dr = null;
             int id = 0;
@@ -475,8 +483,6 @@ namespace eParafia
                     System.Console.WriteLine("Błąd, nie ma ślubu o podanych parametrach!");
                     return;
                 }
-                for (int i = 0; i < dr.FieldCount; ++i)
-                    System.Console.WriteLine(i + " -> " + dr[i]);
                 id = (int)dr[0];
             }
             catch (NpgsqlException exc)
@@ -491,15 +497,17 @@ namespace eParafia
                 dr = null;
             }
             string query = "DELETE FROM sluby WHERE id_sakramentu = " + id;
-            Console.WriteLine("query " + query);
             command = new NpgsqlCommand(query, connection);
             try
             {
                 dr = command.ExecuteReader();
+                while (dr.Read()) ;
+                Console.WriteLine("OK, pomyślnie usunięto.");
             }
             catch (NpgsqlException exc)
             {
-                Console.WriteLine(exc.BaseMessage);
+                Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                Console.WriteLine("Nic nie usunięto.");
             }
             finally
             {
@@ -513,18 +521,17 @@ namespace eParafia
             string pesel = "'" + Console.ReadLine() + "'";
             string query = "DELETE FROM pogrzeby WHERE osoba = " + pesel;
             NpgsqlCommand command = new NpgsqlCommand(query, connection);
-            Console.WriteLine("query " + query);
             NpgsqlDataReader dr = null;
             try
             {
                 dr = command.ExecuteReader();
                 dr.Read();
-                for (int i = 0; i < dr.FieldCount; ++i)
-                    Console.WriteLine("{0} {1}\n", i, dr[i]);
+                Console.WriteLine("OK, pomyślnie usunięto.");
             }
             catch (NpgsqlException exc)
             {
-                Console.WriteLine(exc.BaseMessage);
+                Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                Console.WriteLine("Nic nie usunięto.");
             }
             finally
             {
@@ -573,7 +580,6 @@ namespace eParafia
             string join = "SELECT sa.id FROM sluby sl JOIN sakramenty sa ON sl.id_sakramentu = sa.id WHERE sa.data_udzielenia = " + data + " AND ";
             join += "sl.maz" + pesel_mezczyzny + " AND sl.dane_meza" + dane_mezczyzny + " AND sl.zona" + pesel_kobiety;
             join += " AND sl.dane_zony" + dane_kobiety;
-            Console.WriteLine("joinQuery " + join);
             NpgsqlCommand command = new NpgsqlCommand(join, connection);
             int id = 0;
             NpgsqlDataReader dr = null;
@@ -586,8 +592,6 @@ namespace eParafia
                     System.Console.WriteLine("Błąd, nie ma ślubu o podanych parametrach!");
                     return;
                 }
-                for (int i = 0; i < dr.FieldCount; ++i)
-                    System.Console.WriteLine(i + " -> " + dr[i]);
                 id = (int)dr[0];
             }
             catch (NpgsqlException exc)
@@ -606,10 +610,12 @@ namespace eParafia
             {
                 dr = command.ExecuteReader();
                 while (dr.Read()) ;
+                Console.WriteLine("OK, ślub unieważniony.");
             }
             catch (NpgsqlException exc)
             {
-                Console.WriteLine(exc.BaseMessage);
+                Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                Console.WriteLine("Ślub nie został unieważniony.");
             }
             finally
             {
@@ -1195,17 +1201,18 @@ namespace eParafia
                 
                 string query = "UPDATE parafianie SET pesel = " + new_pesel + ", nazwisko = " + nazwisko + ", imie = " + imie + ", data_urodzenia = " + data_urodzenia + ", plec = " + plec + ", ";
                 query += "ojciec = " + ojciec_pesel + ", matka = " + matka_pesel + ", data_urodzenia = " + data_urodzenia + " WHERE pesel = " + pesel;
-                Console.WriteLine(query);
                 NpgsqlCommand command = new NpgsqlCommand(query, connection);
                 NpgsqlDataReader dr = null;
                 try
                 {
                     dr = command.ExecuteReader();
                     while (dr.Read()) ;
+                    Console.WriteLine("OK, pomyślnie poprawiono.");
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine(exc.BaseMessage);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                    Console.WriteLine("Nic nie zmieniono.");
                 }
                 finally
                 {
@@ -1235,7 +1242,8 @@ namespace eParafia
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine(exc.BaseMessage);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                    Console.WriteLine("Nic nie zmieniono.");
                     return;
                 }
                 finally
@@ -1255,7 +1263,8 @@ namespace eParafia
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine(exc.BaseMessage);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                    Console.WriteLine("Nic nie zmieniono.");
                     return;
                 }
                 finally
@@ -1270,10 +1279,12 @@ namespace eParafia
                 {
                     dr = command.ExecuteReader();
                     while (dr.Read()) ;
+                    Console.WriteLine("OK, pomyślnie poprawiono.");
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine(exc.BaseMessage);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                    Console.WriteLine("Nic nie zmieniono.");
                     return;
                 }
                 finally
@@ -1300,7 +1311,8 @@ namespace eParafia
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine(exc.BaseMessage);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                    Console.WriteLine("Nic nie zmieniono.");
                     return;
                 }
                 finally
@@ -1315,10 +1327,12 @@ namespace eParafia
                 {
                     dr = command.ExecuteReader();
                     while (dr.Read()) ;
+                    Console.WriteLine("OK, pomyślnie poprawiono.");
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine(exc.BaseMessage);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                    Console.WriteLine("Nic nie zmieniono.");
                     return;
                 }
                 finally
@@ -1348,7 +1362,8 @@ namespace eParafia
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine(exc.BaseMessage);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                    Console.WriteLine("Nic nie zmieniono.");
                     return;
                 }
                 finally
@@ -1368,7 +1383,8 @@ namespace eParafia
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine(exc.BaseMessage);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                    Console.WriteLine("Nic nie zmieniono.");
                     return;
                 }
                 finally
@@ -1383,10 +1399,12 @@ namespace eParafia
                 {
                     dr = command.ExecuteReader();
                     while (dr.Read()) ;
+                    Console.WriteLine("OK, pomyślnie poprawiono.");
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine(exc.BaseMessage);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                    Console.WriteLine("Nic nie zmieniono.");
                     return;
                 }
                 finally
@@ -1444,7 +1462,6 @@ namespace eParafia
                 string join = "SELECT sa.id FROM sluby sl JOIN sakramenty sa ON sl.id_sakramentu = sa.id WHERE sa.data_udzielenia = " + data + " AND ";
                 join += "sl.maz" + pesel_mezczyzny + " AND sl.dane_meza" + dane_mezczyzny + " AND sl.zona" + pesel_kobiety;
                 join += " AND sl.dane_zony" + dane_kobiety;
-                Console.WriteLine("joinQuery " + join);
                 NpgsqlCommand command = new NpgsqlCommand(join, connection);
                 NpgsqlDataReader dr = null;
                 int id = 0;
@@ -1457,13 +1474,12 @@ namespace eParafia
                         System.Console.WriteLine("Błąd, nie ma ślubu o podanych parametrach!");
                         return;
                     }
-                    for (int i = 0; i < dr.FieldCount; ++i)
-                        System.Console.WriteLine(i + " -> " + dr[i]);
                     id = (int)dr[0];
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine(exc.BaseMessage);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                    Console.WriteLine("Nic nie zmieniono.");
                     return;
                 }
                 finally
@@ -1474,8 +1490,6 @@ namespace eParafia
                 }
                 string query = "UPDATE sluby SET ";                
                 query += "swiadek1 = " + s1 + ", swiadek2 = " + s2 + " WHERE id_sakramentu = " + id;
-                Console.WriteLine("query 2 : " + query);
-
                 command = new NpgsqlCommand(query, connection);
                 try
                 {
@@ -1483,7 +1497,8 @@ namespace eParafia
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine("BŁĄD: " + exc.BaseMessage);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                    Console.WriteLine("Nic nie zmieniono.");
                 }
                 finally
                 {
@@ -1495,10 +1510,13 @@ namespace eParafia
                 try
                 {
                     dr = command.ExecuteReader();
+                    while (dr.Read()) ;
+                    Console.WriteLine("OK, pomyślnie poprawiono.");
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine(exc.BaseMessage);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                    Console.WriteLine("Nic nie zmieniono.");
                 }
                 finally
                 {
@@ -1526,10 +1544,12 @@ namespace eParafia
                 {
                     dr = command.ExecuteReader();
                     while (dr.Read()) ;
+                    Console.WriteLine("OK, pomyślnie poprawiono");
                 }
                 catch (NpgsqlException exc)
                 {
-                    Console.WriteLine(exc.Message);
+                    Console.WriteLine("BŁĄD: " + exc.BaseMessage + " !");
+                    Console.WriteLine("Nic nie zmieniono.");
                 }
                 finally
                 {
@@ -1544,6 +1564,7 @@ namespace eParafia
             Console.WriteLine("Witaj w aplikacji eParafia!");
             while (logged == false)
                 LogIn();
+
             Console.WriteLine("Pomyślnie zalogowano.");
             Console.WriteLine("Aby wyświetlić instrukcję, wpisz \"manual\".");
             Console.WriteLine("Aby zakończyć, wpisz \"koniec\".");

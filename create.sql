@@ -457,6 +457,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION delete_komunie() RETURNS TRIGGER AS $delete_komunie$
 	BEGIN
 		DELETE FROM sakramenty where id = OLD.id_sakramentu;
+		
 		RETURN OLD;
 	END;
 $delete_komunie$ LANGUAGE plpgsql;
@@ -467,6 +468,7 @@ CREATE TRIGGER delete_komunie AFTER DELETE ON pierwsze_komunie FOR EACH ROW
 CREATE OR REPLACE FUNCTION delete_bierzmowania() RETURNS TRIGGER AS $delete_bierzmowania$
 	BEGIN
 		DELETE FROM sakramenty where id = OLD.id_sakramentu;
+
 		RETURN OLD;
 	END;
 $delete_bierzmowania$ LANGUAGE plpgsql;
@@ -488,7 +490,7 @@ DROP VIEW IF EXISTS all_parafianie;
 CREATE VIEW all_parafianie as
 	SELECT p.imie||' '||p.nazwisko||' data urodzenia: '||p.data_urodzenia, p.pesel as osoba,
 	(SELECT 'Ojciec: '||(CASE WHEN p.ojciec IS NULL THEN 'Nieznany' ELSE (SELECT par.imie||' '||par.nazwisko FROM parafianie par WHERE par.pesel = p.ojciec)||' (PESEL: '||p.ojciec||')' END)) as ojciec,
-	(SELECT 'Matka: '||(CASE WHEN p.ojciec IS NULL THEN 'Nieznana' ELSE (SELECT par.imie||' '||par.nazwisko FROM parafianie par WHERE par.pesel = p.matka)||' (PESEL: '||p.matka||')' END)) as matka,
+	(SELECT 'Matka: '||(CASE WHEN p.matka IS NULL THEN 'Nieznana' ELSE (SELECT par.imie||' '||par.nazwisko FROM parafianie par WHERE par.pesel = p.matka)||' (PESEL: '||p.matka||')' END)) as matka,
 	(SELECT s.data_udzielenia FROM sakramenty s JOIN chrzty c ON c.id_sakramentu = s.id WHERE c.osoba = p.pesel) as chrzest,
 	(SELECT s.data_udzielenia FROM sakramenty s JOIN pierwsze_komunie pk ON pk.id_sakramentu = s.id WHERE pk.osoba = p.pesel) as pierwsza_komunia,
 	(SELECT s.data_udzielenia FROM sakramenty s JOIN bierzmowania b ON b.id_sakramentu = s.id WHERE b.osoba = p.pesel) as bierzmowanie,
